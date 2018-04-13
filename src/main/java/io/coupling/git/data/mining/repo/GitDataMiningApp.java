@@ -33,7 +33,7 @@ public class GitDataMiningApp {
                 parameters);
             session.writeTransaction(transaction -> transaction.run(persistChangedFileStatement));
           });
-          changes.forEach(changedFile -> {
+          changes.stream().findAny().ifPresent(changedFile -> {
             changes.stream().filter(change -> !changedFile.equals(change)).forEach(change -> {
               final String request =
                   "MATCH (firstFile:ChangedFile) WHERE firstFile.path=$firstPath\n"
