@@ -1,0 +1,19 @@
+group 'io.coupling'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.10.0.201712302008-r'
+    compile group: 'org.neo4j.driver', name: 'neo4j-java-driver', version: '1.4.4'
+    compile group: 'org.jooq', name: 'jool', version: '0.9.12'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.3'
+    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.3'
+}
