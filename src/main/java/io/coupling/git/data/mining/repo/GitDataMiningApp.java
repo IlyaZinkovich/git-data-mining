@@ -33,7 +33,7 @@ public class GitDataMiningApp {
                 parameters);
             session.writeTransaction(transaction -> transaction.run(persistChangedFileStatement));
           });
-          changes.forEach(changedFile -> {
+          changes.stream().findAny().ifPresent(changedFile -> {
             changes.stream().filter(change -> !changedFile.equals(change)).forEach(change -> {
               final String request =
                   "MATCH (firstFile:ChangedFile) WHERE firstFile.path=$firstPath\n"
@@ -53,7 +53,7 @@ public class GitDataMiningApp {
   }
 
   private static Stream<Commit> commits() {
-    final Repository repository = new RepoFactory().get("../sonarlint-intellij/.git");
+    final Repository repository = new RepoFactory().get("../careem/uid/.git");
     final Git git = new Git(repository);
     try (final ObjectReader objectReader = repository.newObjectReader()) {
       final CommitTreeParserFactory parserFactory = new CommitTreeParserFactory(objectReader);
