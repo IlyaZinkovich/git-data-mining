@@ -21,11 +21,11 @@ final class DiffWithParent {
     this.git = git;
   }
 
-  public Set<Change> changes() {
+  public Set<ChangedFile> changes() {
     return diffEntries().stream()
         .map(DiffEntry::getNewPath)
         .distinct()
-        .map(Change::new)
+        .map(ChangedFile::new)
         .collect(toSet());
   }
 
