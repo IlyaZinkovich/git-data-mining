@@ -1,22 +1,24 @@
 package io.coupling.git.data.mining.repo;
 
+import java.time.Instant;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
-import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.revwalk.RevCommit;
 
-public class Commits {
+class Commits {
 
-  private final Git git;
-  private final CommitTreeParserFactory parserFactory;
+  private final GitLog gitLog;
 
-  Commits(final Git git, final CommitTreeParserFactory parserFactory) {
-    this.git = git;
-    this.parserFactory = parserFactory;
+  Commits(final GitLog gitLog) {
+    this.gitLog = gitLog;
   }
 
-  public Stream<Commit> stream() {
-    return new GitLog(git).stream()
-        .map(commit -> new DiffWithParent(commit, parserFactory, git))
-        .map(DiffWithParent::changes)
-        .map(Commit::new);
+  Stream<Commit> stream(final Function<RevCommit, DiffWithParent> revCommitTransformer) {
+    return gitLog.stream().map(revCommit -> {
+      final Instant timestamp = revCommit.getAuthorIdent().getWhen().toInstant();
+      final Set<ChangedFile> changes = revCommitTransformer.apply(revCommit).changes();
+      return new Commit(changes, timestamp);
+    });
   }
 }

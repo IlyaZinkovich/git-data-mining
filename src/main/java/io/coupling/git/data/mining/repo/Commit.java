@@ -1,12 +1,28 @@
 package io.coupling.git.data.mining.repo;
 
+import java.time.Instant;
 import java.util.Set;
 
-public class Commit {
+class Commit {
 
-  private final Set<Change> changes;
+  private final Set<ChangedFile> changes;
+  private final Instant timestamp;
 
-  public Commit(final Set<Change> changes) {
+  Commit(final Set<ChangedFile> changes, final Instant timestamp) {
     this.changes = changes;
+    this.timestamp = timestamp;
+  }
+
+  Set<ChangedFile> changes() {
+    return changes;
+  }
+
+  @Override
+  public String toString() {
+    return changes.toString();
+  }
+
+  public Instant timestamp() {
+    return timestamp;
   }
 }
