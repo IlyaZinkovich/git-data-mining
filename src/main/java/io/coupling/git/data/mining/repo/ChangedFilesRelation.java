@@ -21,7 +21,7 @@ public class ChangedFilesRelation {
   public Map<String, Object> toParameters() {
     return ImmutableMap.<String, Object>builder()
         .put("firstPath", firstFile.path())
-        .put("secondPath", firstFile.path())
+        .put("secondPath", secondFile.path())
         .put("timestamp", timestamp.toString())
         .build();
   }

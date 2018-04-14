@@ -1,6 +1,9 @@
 package io.coupling.git.data.mining.repo;
 
+import io.coupling.git.data.mining.analysis.CoupledPairs;
 import io.coupling.git.data.mining.analysis.GraphCommitRepository;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.eclipse.jgit.api.Git;
@@ -22,6 +25,7 @@ public class GitDataMiningApp {
       try (final Session session = driver.session()) {
         final GraphCommitRepository commitRepository = new GraphCommitRepository(session);
         commits().forEach(commitRepository::persist);
+        new CoupledPairs(session).query(10, Instant.now().minus(Duration.ofDays(30)));
       }
     }
   }
