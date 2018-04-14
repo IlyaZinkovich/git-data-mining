@@ -9,8 +9,12 @@ import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.Statement;
 import org.neo4j.driver.v1.StatementResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CoupledPairs {
+
+  private static final Logger log = LoggerFactory.getLogger(CoupledPairs.class);
 
   private static final String TOP_COUPLED_FILE_CHANGES_REQUEST =
       "MATCH (file:ChangedFile)-[r:CHANGED_TOGETHER_WITH]-(anotherFile:ChangedFile)\n"
@@ -32,7 +36,7 @@ public class CoupledPairs {
     final Statement statement = new Statement(TOP_COUPLED_FILE_CHANGES_REQUEST, params);
     final StatementResult result =
         session.readTransaction(transaction -> transaction.run(statement));
-    result.forEachRemaining(record -> System.out.println(recordToString(record)));
+    result.forEachRemaining(record -> log.debug(recordToString(record)));
   }
 
   private String recordToString(final Record record) {

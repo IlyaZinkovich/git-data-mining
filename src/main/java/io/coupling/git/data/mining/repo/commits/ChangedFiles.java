@@ -1,4 +1,4 @@
-package io.coupling.git.data.mining.repo;
+package io.coupling.git.data.mining.repo.commits;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -14,7 +14,7 @@ public class ChangedFiles {
     this.diffEntries = diffEntries;
   }
 
-  public Set<ChangedFile> changes() {
+  public Set<ChangedFile> set() {
     return diffEntries.stream()
         .map(DiffEntry::getNewPath)
         .distinct()

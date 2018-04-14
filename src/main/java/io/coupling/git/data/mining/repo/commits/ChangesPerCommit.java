@@ -1,4 +1,4 @@
-package io.coupling.git.data.mining.repo;
+package io.coupling.git.data.mining.repo.commits;
 
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
@@ -7,12 +7,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class Commit {
+public class ChangesPerCommit {
 
-  private final Set<ChangedFile> changes;
   private final Instant timestamp;
+  private final Set<ChangedFile> changes;
 
-  Commit(final Set<ChangedFile> changes, final Instant timestamp) {
+  ChangesPerCommit(final Set<ChangedFile> changes, final Instant timestamp) {
     this.changes = changes;
     this.timestamp = timestamp;
   }

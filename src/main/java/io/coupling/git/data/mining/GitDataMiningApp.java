@@ -1,7 +1,9 @@
-package io.coupling.git.data.mining.repo;
+package io.coupling.git.data.mining;
 
 import io.coupling.git.data.mining.analysis.CoupledPairs;
-import io.coupling.git.data.mining.analysis.PersistedCommit;
+import io.coupling.git.data.mining.analysis.PersistentCommit;
+import io.coupling.git.data.mining.repo.commits.ChangesPerCommit;
+import io.coupling.git.data.mining.repo.commits.GitCommits;
 import io.coupling.git.data.mining.repo.diff.CommitTreeParserFactory;
 import io.coupling.git.data.mining.repo.diff.GitDiff;
 import io.coupling.git.data.mining.repo.factory.RepoFactory;
@@ -25,21 +27,21 @@ public class GitDataMiningApp {
     final String pass = "root";
     try (final Driver driver = GraphDatabase.driver(uri, AuthTokens.basic(user, pass))) {
       try (final Session session = driver.session()) {
-        commits().map(commit -> new PersistedCommit(session, commit))
-            .forEach(PersistedCommit::persist);
+        commits().map(commit -> new PersistentCommit(session, commit))
+            .forEach(PersistentCommit::persist);
         new CoupledPairs(session).query(10, Instant.now().minus(Duration.ofDays(30)));
       }
     }
   }
 
-  private static Stream<Commit> commits() {
-    final Repository repository = new RepoFactory().get("../sonarlint-intellij/.git");
+  private static Stream<ChangesPerCommit> commits() {
+    final Repository repository = new RepoFactory().get("../spring-framework/.git");
     final Git git = new Git(repository);
     try (final ObjectReader objectReader = repository.newObjectReader()) {
       final CommitTreeParserFactory parserFactory = new CommitTreeParserFactory(objectReader);
       final GitLog gitLog = new GitLog(git);
       final GitDiff gitDiff = new GitDiff(parserFactory, git);
-      return new Commits(gitLog, gitDiff).stream();
+      return new GitCommits(gitLog, gitDiff).changesPerCommit();
     }
   }
 }

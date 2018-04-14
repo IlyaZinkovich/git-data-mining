@@ -1,10 +1,10 @@
 package io.coupling.git.data.mining.analysis;
 
-import io.coupling.git.data.mining.repo.Commit;
+import io.coupling.git.data.mining.repo.commits.ChangesPerCommit;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.Statement;
 
-public class PersistedCommit {
+public class PersistentCommit {
 
   private static final String PERSIST_CHANGED_FILE_REQUEST =
       "MERGE (file:ChangedFile {path:$path})";
@@ -14,9 +14,9 @@ public class PersistedCommit {
           + "CREATE (firstFile)-[:CHANGED_TOGETHER_WITH {timestamp:$timestamp}]->(secondFile)\n";
 
   private final Session session;
-  private final Commit commit;
+  private final ChangesPerCommit commit;
 
-  public PersistedCommit(final Session session, final Commit commit) {
+  public PersistentCommit(final Session session, final ChangesPerCommit commit) {
     this.session = session;
     this.commit = commit;
   }

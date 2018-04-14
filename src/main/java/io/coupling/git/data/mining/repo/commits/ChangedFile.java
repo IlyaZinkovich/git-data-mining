@@ -1,4 +1,4 @@
-package io.coupling.git.data.mining.repo;
+package io.coupling.git.data.mining.repo.commits;
 
 import java.util.Objects;
 
