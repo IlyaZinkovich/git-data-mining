@@ -1,4 +1,4 @@
-package io.coupling.git.data.mining.repo;
+package io.coupling.git.data.mining.repo.diff;
 
 import java.io.IOException;
 import org.eclipse.jgit.lib.ObjectReader;
@@ -6,11 +6,11 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.EmptyTreeIterator;
 
-final class CommitTreeParserFactory {
+public final class CommitTreeParserFactory {
 
   private final ObjectReader objectReader;
 
-  CommitTreeParserFactory(final ObjectReader objectReader) {
+  public CommitTreeParserFactory(final ObjectReader objectReader) {
     this.objectReader = objectReader;
   }
 

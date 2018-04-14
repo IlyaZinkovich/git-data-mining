@@ -1,35 +1,22 @@
-package io.coupling.git.data.mining.repo;
-
-import static java.util.stream.Collectors.toSet;
+package io.coupling.git.data.mining.repo.diff;
 
 import java.util.List;
-import java.util.Set;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.revwalk.RevCommit;
 
-final class DiffWithParent {
+public class GitDiff {
 
-  private final RevCommit commit;
   private final CommitTreeParserFactory factory;
   private final Git git;
 
-  DiffWithParent(final RevCommit commit, final CommitTreeParserFactory factory, final Git git) {
-    this.commit = commit;
+  public GitDiff(final CommitTreeParserFactory factory, final Git git) {
     this.factory = factory;
     this.git = git;
   }
 
-  public Set<ChangedFile> changes() {
-    return diffEntries().stream()
-        .map(DiffEntry::getNewPath)
-        .distinct()
-        .map(ChangedFile::new)
-        .collect(toSet());
-  }
-
-  private List<DiffEntry> diffEntries() {
+  public List<DiffEntry> diffWithParent(final RevCommit commit) {
     try {
       return git.diff()
           .setNewTree(factory.commitTreeParser(commit))

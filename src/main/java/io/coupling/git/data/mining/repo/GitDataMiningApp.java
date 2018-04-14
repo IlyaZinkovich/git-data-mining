@@ -2,14 +2,16 @@ package io.coupling.git.data.mining.repo;
 
 import io.coupling.git.data.mining.analysis.CoupledPairs;
 import io.coupling.git.data.mining.analysis.PersistedCommit;
+import io.coupling.git.data.mining.repo.diff.CommitTreeParserFactory;
+import io.coupling.git.data.mining.repo.diff.GitDiff;
+import io.coupling.git.data.mining.repo.factory.RepoFactory;
+import io.coupling.git.data.mining.repo.log.GitLog;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.GraphDatabase;
@@ -36,9 +38,8 @@ public class GitDataMiningApp {
     try (final ObjectReader objectReader = repository.newObjectReader()) {
       final CommitTreeParserFactory parserFactory = new CommitTreeParserFactory(objectReader);
       final GitLog gitLog = new GitLog(git);
-      Function<RevCommit, DiffWithParent> revCommitTransformer =
-          commit -> new DiffWithParent(commit, parserFactory, git);
-      return new Commits(gitLog).stream(revCommitTransformer);
+      final GitDiff gitDiff = new GitDiff(parserFactory, git);
+      return new Commits(gitLog, gitDiff).stream();
     }
   }
 }

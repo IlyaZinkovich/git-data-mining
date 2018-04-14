@@ -1,13 +1,13 @@
-package io.coupling.git.data.mining.repo;
+package io.coupling.git.data.mining.repo.factory;
 
 import java.io.File;
 import java.io.IOException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
-final class RepoFactory {
+public final class RepoFactory {
 
-  Repository get(final String pathToRepo) {
+  public Repository get(final String pathToRepo) {
     try {
       return new FileRepositoryBuilder()
           .setGitDir(new File(pathToRepo))

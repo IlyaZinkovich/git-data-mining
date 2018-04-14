@@ -1,4 +1,4 @@
-package io.coupling.git.data.mining.repo;
+package io.coupling.git.data.mining.repo.diff;
 
 import java.io.IOException;
 import org.eclipse.jgit.lib.ObjectId;

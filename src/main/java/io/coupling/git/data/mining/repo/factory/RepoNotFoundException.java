@@ -1,4 +1,4 @@
-package io.coupling.git.data.mining.repo;
+package io.coupling.git.data.mining.repo.factory;
 
 final class RepoNotFoundException extends RuntimeException {
 
