@@ -1,11 +1,13 @@
 package io.coupling.git.data.mining.repo;
 
-import static java.util.stream.Collectors.toSet;
-
+import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-class Commit {
+public class Commit {
 
   private final Set<ChangedFile> changes;
   private final Instant timestamp;
@@ -15,24 +17,28 @@ class Commit {
     this.timestamp = timestamp;
   }
 
-  Set<ChangedFile> changes() {
-    return changes;
-  }
-
-  Set<ChangesPair> changesPairs() {
+  public Stream<Map<String, Object>> toChangedFileRelationsParameters() {
     return changes.stream()
-        .flatMap(changedFile -> changes.stream()
-            .filter(anotherChangedFile -> !changedFile.equals(anotherChangedFile))
-            .map(anotherChangedFile -> new ChangesPair(changedFile, anotherChangedFile))
-        ).collect(toSet());
+        .flatMap(this::relationsWith)
+        .distinct()
+        .map(ChangedFilesRelation::toParameters);
   }
 
-  @Override
-  public String toString() {
-    return changes.toString();
+  private Stream<ChangedFilesRelation> relationsWith(final ChangedFile changedFile) {
+    return changes.stream()
+        .filter(otherChangedFile -> !changedFile.equals(otherChangedFile))
+        .map(otherChangedFile ->
+            new ChangedFilesRelation(changedFile, otherChangedFile, timestamp));
   }
 
-  public Instant timestamp() {
-    return timestamp;
+  public Stream<Map<String, Object>> toChangedFilesParameters(final Predicate<String> pathFilter) {
+    return changes.stream()
+        .map(ChangedFile::path)
+        .filter(pathFilter)
+        .map(this::pathToParameters);
+  }
+
+  private Map<String, Object> pathToParameters(final String path) {
+    return ImmutableMap.of("path", path);
   }
 }
