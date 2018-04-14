@@ -3,7 +3,6 @@ package io.coupling.git.data.mining.repo;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -38,12 +37,7 @@ public class GitDataMiningApp {
                 parameters);
             session.writeTransaction(transaction -> transaction.run(persistChangedFileStatement));
           });
-          final Set<ChangesPair> pairs = new HashSet<>();
-          changes.forEach(changedFile ->
-              changes.stream().filter(change -> !changedFile.equals(change))
-                  .map(change -> new ChangesPair(changedFile, change))
-                  .forEach(pairs::add));
-          pairs.forEach(pair -> {
+          commit.changesPairs().forEach(pair -> {
             final String request =
                 "MATCH (firstFile:ChangedFile) WHERE firstFile.path=$firstPath\n"
                     + "MATCH (secondFile:ChangedFile) WHERE secondFile.path=$secondPath\n"

@@ -1,5 +1,7 @@
 package io.coupling.git.data.mining.repo;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.time.Instant;
 import java.util.Set;
 
@@ -15,6 +17,14 @@ class Commit {
 
   Set<ChangedFile> changes() {
     return changes;
+  }
+
+  Set<ChangesPair> changesPairs() {
+    return changes.stream()
+        .flatMap(changedFile -> changes.stream()
+            .filter(anotherChangedFile -> !changedFile.equals(anotherChangedFile))
+            .map(anotherChangedFile -> new ChangesPair(changedFile, anotherChangedFile))
+        ).collect(toSet());
   }
 
   @Override
