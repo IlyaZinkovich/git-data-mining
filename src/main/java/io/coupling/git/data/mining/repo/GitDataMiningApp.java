@@ -1,6 +1,9 @@
 package io.coupling.git.data.mining.repo;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -24,7 +27,9 @@ public class GitDataMiningApp {
     try (final Driver driver = GraphDatabase.driver(uri, AuthTokens.basic(user, pass))) {
       try (final Session session = driver.session()) {
         commits().forEach(commit -> {
-          final Set<ChangedFile> changes = commit.changes();
+          final Set<ChangedFile> changes = commit.changes().stream()
+              .filter(change -> change.path().endsWith(".java"))
+              .collect(toSet());
           changes.forEach(changedFile -> {
             final String persistChangedFile = "MERGE (file:ChangedFile {path:$path})";
             final Map<String, Object> parameters = new HashMap<>();
@@ -33,19 +38,22 @@ public class GitDataMiningApp {
                 parameters);
             session.writeTransaction(transaction -> transaction.run(persistChangedFileStatement));
           });
-          changes.stream().findAny().ifPresent(changedFile -> {
-            changes.stream().filter(change -> !changedFile.equals(change)).forEach(change -> {
-              final String request =
-                  "MATCH (firstFile:ChangedFile) WHERE firstFile.path=$firstPath\n"
-                      + "MATCH (secondFile:ChangedFile) WHERE secondFile.path=$secondPath\n"
-                      + "CREATE (firstFile)-[:CHANGED_TOGETHER_WITH {timestamp:$timestamp}]->(secondFile)\n";
-              final Map<String, Object> parameters = new HashMap<>();
-              parameters.put("firstPath", changedFile.path());
-              parameters.put("secondPath", change.path());
-              parameters.put("timestamp", commit.timestamp().toString());
-              final Statement persistChangedFileStatement = new Statement(request, parameters);
-              session.writeTransaction(transaction -> transaction.run(persistChangedFileStatement));
-            });
+          final Set<ChangesPair> pairs = new HashSet<>();
+          changes.forEach(changedFile ->
+              changes.stream().filter(change -> !changedFile.equals(change))
+                  .map(change -> new ChangesPair(changedFile, change))
+                  .forEach(pairs::add));
+          pairs.forEach(pair -> {
+            final String request =
+                "MATCH (firstFile:ChangedFile) WHERE firstFile.path=$firstPath\n"
+                    + "MATCH (secondFile:ChangedFile) WHERE secondFile.path=$secondPath\n"
+                    + "CREATE (firstFile)-[:CHANGED_TOGETHER_WITH {timestamp:$timestamp}]->(secondFile)\n";
+            final Map<String, Object> parameters = new HashMap<>();
+            parameters.put("firstPath", pair.firstPath());
+            parameters.put("secondPath", pair.secondPath());
+            parameters.put("timestamp", commit.timestamp().toString());
+            final Statement persistChangedFileStatement = new Statement(request, parameters);
+            session.writeTransaction(transaction -> transaction.run(persistChangedFileStatement));
           });
         });
       }
