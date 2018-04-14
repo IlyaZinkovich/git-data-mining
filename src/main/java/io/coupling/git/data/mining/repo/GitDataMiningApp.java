@@ -21,9 +21,7 @@ public class GitDataMiningApp {
     try (final Driver driver = GraphDatabase.driver(uri, AuthTokens.basic(user, pass))) {
       try (final Session session = driver.session()) {
         final GraphCommitRepository commitRepository = new GraphCommitRepository(session);
-        commits()
-            .peek(commitRepository::persistChangedFiles)
-            .forEach(commitRepository::persistChangedFilesRelations);
+        commits().forEach(commitRepository::persist);
       }
     }
   }
